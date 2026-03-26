@@ -1,135 +1,154 @@
-# Template for Isaac Lab Projects
+# UR5e Reach Task — Isaac Lab
+
+A custom reinforcement learning environment for the **Universal Robots UR5e** robotic arm, built with [Isaac Lab](https://isaac-sim.github.io/IsaacLab). The agent learns to reach target end-effector poses using **Proximal Policy Optimization (PPO)** via the [skrl](https://skrl.readthedocs.io) library.
+
+---
 
 ## Overview
 
-This project/repository serves as a template for building projects or extensions based on Isaac Lab.
-It allows you to develop in an isolated environment, outside of the core Isaac Lab repository.
+The task is a 6-DOF end-effector pose tracking problem. The robot receives a randomly sampled target pose within its reachable workspace and must move its `wrist_3_link` to match the target position and orientation. The environment is fully parallelized using Isaac Lab's Manager-Based RL framework.
 
-**Key Features:**
+**Key details:**
 
-- `Isolation` Work outside the core Isaac Lab repository, ensuring that your development efforts remain self-contained.
-- `Flexibility` This template is set up to allow your code to be run as an extension in Omniverse.
+- Robot: Universal Robots UR5e
+- Task: End-effector reach (position + orientation tracking)
+- RL algorithm: PPO (skrl)
+- Environment: 4096 parallel envs (configurable)
+- Action space: Joint position control (scaled, with default offset)
+- Observation space: Joint positions, joint velocities, pose command, last action
+- Episode length: 12 seconds
 
-**Keywords:** extension, template, isaaclab
+---
+
+## Requirements
+
+| Dependency | Version |
+|---|---|
+| Isaac Sim | 5.0.0 |
+| Isaac Lab | 0.46 |
+| skrl | latest |
+| Python | 3.11 |
+| CUDA | 11.8 |
+
+---
 
 ## Installation
 
-- Install Isaac Lab by following the [installation guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html).
-  We recommend using the conda or uv installation as it simplifies calling Python scripts from the terminal.
+**1. Install Isaac Lab** by following the [official guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html).
 
-- Clone or copy this project/repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
-
-- Using a python interpreter that has Isaac Lab installed, install the library in editable mode using:
-
-    ```bash
-    # use 'PATH_TO_isaaclab.sh|bat -p' instead of 'python' if Isaac Lab is not installed in Python venv or conda
-    python -m pip install -e source/UR5e_reach_task
-
-- Verify that the extension is correctly installed by:
-
-    - Listing the available tasks:
-
-        Note: It the task name changes, it may be necessary to update the search pattern `"Template-"`
-        (in the `scripts/list_envs.py` file) so that it can be listed.
-
-        ```bash
-        # use 'FULL_PATH_TO_isaaclab.sh|bat -p' instead of 'python' if Isaac Lab is not installed in Python venv or conda
-        python scripts/list_envs.py
-        ```
-
-    - Running a task:
-
-        ```bash
-        # use 'FULL_PATH_TO_isaaclab.sh|bat -p' instead of 'python' if Isaac Lab is not installed in Python venv or conda
-        python scripts/<RL_LIBRARY>/train.py --task=<TASK_NAME>
-        ```
-
-    - Running a task with dummy agents:
-
-        These include dummy agents that output zero or random agents. They are useful to ensure that the environments are configured correctly.
-
-        - Zero-action agent
-
-            ```bash
-            # use 'FULL_PATH_TO_isaaclab.sh|bat -p' instead of 'python' if Isaac Lab is not installed in Python venv or conda
-            python scripts/zero_agent.py --task=<TASK_NAME>
-            ```
-        - Random-action agent
-
-            ```bash
-            # use 'FULL_PATH_TO_isaaclab.sh|bat -p' instead of 'python' if Isaac Lab is not installed in Python venv or conda
-            python scripts/random_agent.py --task=<TASK_NAME>
-            ```
-
-### Set up IDE (Optional)
-
-To setup the IDE, please follow these instructions:
-
-- Run VSCode Tasks, by pressing `Ctrl+Shift+P`, selecting `Tasks: Run Task` and running the `setup_python_env` in the drop down menu.
-  When running this task, you will be prompted to add the absolute path to your Isaac Sim installation.
-
-If everything executes correctly, it should create a file .python.env in the `.vscode` directory.
-The file contains the python paths to all the extensions provided by Isaac Sim and Omniverse.
-This helps in indexing all the python modules for intelligent suggestions while writing code.
-
-### Setup as Omniverse Extension (Optional)
-
-We provide an example UI extension that will load upon enabling your extension defined in `source/UR5e_reach_task/UR5e_reach_task/ui_extension_example.py`.
-
-To enable your extension, follow these steps:
-
-1. **Add the search path of this project/repository** to the extension manager:
-    - Navigate to the extension manager using `Window` -> `Extensions`.
-    - Click on the **Hamburger Icon**, then go to `Settings`.
-    - In the `Extension Search Paths`, enter the absolute path to the `source` directory of this project/repository.
-    - If not already present, in the `Extension Search Paths`, enter the path that leads to Isaac Lab's extension directory directory (`IsaacLab/source`)
-    - Click on the **Hamburger Icon**, then click `Refresh`.
-
-2. **Search and enable your extension**:
-    - Find your extension under the `Third Party` category.
-    - Toggle it to enable your extension.
-
-## Code formatting
-
-We have a pre-commit template to automatically format your code.
-To install pre-commit:
+**2. Clone this repository** outside the IsaacLab directory:
 
 ```bash
-pip install pre-commit
+git clone https://github.com/FarkasBalintKaroly/IsaacLab_UR5e_Reach_Task.git
+cd IsaacLab_UR5e_Reach_Task
 ```
 
-Then you can run pre-commit with:
+**3. Install the package** in editable mode:
 
 ```bash
-pre-commit run --all-files
+# Replace PATH_TO with the actual path to your IsaacLab installation
+PATH_TO/isaaclab.sh -p -m pip install -e source/UR5e_reach_task
+PATH_TO/isaaclab.sh -p -m pip install -e source/isaaclab_assets
 ```
 
-## Troubleshooting
+**4. Place the UR5e USD asset** in the repository root:
 
-### Pylance Missing Indexing of Extensions
-
-In some VsCode versions, the indexing of part of the extensions is missing.
-In this case, add the path to your extension in `.vscode/settings.json` under the key `"python.analysis.extraPaths"`.
-
-```json
-{
-    "python.analysis.extraPaths": [
-        "<path-to-ext-repo>/source/UR5e_reach_task"
-    ]
-}
+```
+IsaacLab_UR5e_Reach_Task/
+└── ur5e.usd      ← required
 ```
 
-### Pylance Crash
+---
 
-If you encounter a crash in `pylance`, it is probable that too many files are indexed and you run out of memory.
-A possible solution is to exclude some of omniverse packages that are not used in your project.
-To do so, modify `.vscode/settings.json` and comment out packages under the key `"python.analysis.extraPaths"`
-Some examples of packages that can likely be excluded are:
+## Training
 
-```json
-"<path-to-isaac-sim>/extscache/omni.anim.*"         // Animation packages
-"<path-to-isaac-sim>/extscache/omni.kit.*"          // Kit UI tools
-"<path-to-isaac-sim>/extscache/omni.graph.*"        // Graph UI tools
-"<path-to-isaac-sim>/extscache/omni.services.*"     // Services tools
-...
+```bash
+../../IsaacLab/isaaclab.sh -p scripts/skrl/train.py --task=Isaac-Reach-UR5E-v0 --headless
 ```
+
+To reduce the number of parallel environments (e.g. for less VRAM):
+
+```bash
+../../IsaacLab/isaaclab.sh -p scripts/skrl/train.py --task=Isaac-Reach-UR5E-v0 --headless --num_envs 512
+```
+
+Training logs are saved to:
+
+```
+logs/skrl/reach_ur5/
+```
+
+Monitor training with TensorBoard (in a separate terminal):
+
+```bash
+../../IsaacLab/isaaclab.sh -p -m tensorboard.main --logdir logs/skrl/reach_ur5
+```
+
+---
+
+## Evaluation / Play
+
+```bash
+../../IsaacLab/isaaclab.sh -p scripts/skrl/play.py --task=Isaac-Reach-UR5E-v0 --num_envs 50
+```
+
+---
+
+## Project Structure
+
+```
+IsaacLab_UR5e_Reach_Task/
+├── scripts/
+│   ├── skrl/
+│   │   ├── train.py              # PPO training entry point
+│   │   └── play.py               # Evaluation / playback
+│   ├── zero_agent.py             # Zero-action baseline
+│   └── random_agent.py           # Random-action baseline
+├── source/
+│   ├── isaaclab_assets/
+│   │   └── isaaclab_assets/
+│   │       └── robots/
+│   │           └── universal_robots.py   # UR5E_CFG definition
+│   └── UR5e_reach_task/
+│       └── UR5e_reach_task/
+│           └── tasks/
+│               └── manager_based/
+│                   └── ur5e_reach_task/
+│                       ├── ur5e_reach_task_env_cfg.py  # Full env config
+│                       ├── mdp/                        # MDP components
+│                       ├── agents/
+│                       │   └── skrl_ppo_cfg.yaml       # PPO hyperparameters
+│                       └── __init__.py                 # Task registration
+├── ur5e.usd                      # UR5e robot asset (required)
+└── README.md
+```
+
+---
+
+## Training Results
+
+> Results will be added after training converges.
+
+| Metric | Value |
+|---|---|
+| Episodes | — |
+| Mean reward | — |
+| Position error (final) | — |
+| Training time | — |
+
+<!-- Add TensorBoard screenshots or reward curve plots here -->
+
+---
+
+## Known Issues
+
+- **Warp CUDA warning** on startup (`Failed to get driver entry point 'cuDeviceGetUuid'`) — cosmetic, does not affect training.
+- **CPU powersave mode** warning — switch to performance mode for faster training: `sudo cpupower frequency-set -g performance`
+- The `isaaclab_assets` package in this repo takes precedence over the Isaac Lab built-in version — this is intentional, as it provides the custom `UR5E_CFG`.
+
+---
+
+## License
+ 
+This project is based on the [Isaac Lab](https://github.com/isaac-sim/IsaacLab) template.
+See [LICENSE](LICENSE) for details.
