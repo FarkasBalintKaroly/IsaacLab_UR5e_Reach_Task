@@ -125,20 +125,6 @@ IsaacLab_UR5e_Reach_Task/
 
 ---
 
-## Training Results
-
-> Results will be added after training converges.
-
-| Metric | Value |
-|---|---|
-| Episodes | — |
-| Mean reward | — |
-| Position error (final) | — |
-| Training time | — |
-
-<!-- Add TensorBoard screenshots or reward curve plots here -->
-
----
 
 ## Known Issues
 
