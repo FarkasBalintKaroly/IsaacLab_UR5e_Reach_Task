@@ -136,5 +136,9 @@ IsaacLab_UR5e_Reach_Task/
 
 ## License
  
-This project is based on the [Isaac Lab](https://github.com/isaac-sim/IsaacLab) template.
-See [LICENSE](LICENSE) for details.
+This project is licensed under the [MIT License](LICENSE).
+
+It builds upon [Isaac Lab](https://github.com/isaac-sim/IsaacLab), 
+which is distributed under the Apache 2.0 License.
+
+© 2025 Farkas Bálint
